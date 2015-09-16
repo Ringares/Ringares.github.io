@@ -3,7 +3,7 @@ layout: post
 category : jekyll
 tagline: "jekyll"
 description: "jekyll tutorial"
-tags : [intro, beginner, jekyll, tutorial]
+tags : [jekyll]
 ---
 
 This Jekyll introduction will outline specifically  what Jekyll is and why you would want to use it.
