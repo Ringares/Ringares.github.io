@@ -68,11 +68,11 @@ tags: [android]
 	I/System.out﹕ point: x=354.85287 y=35.147232
 	I/System.out﹕ tangent: 0.7071065 0.70710707
 	
-![example](/images/2015-09-17-android-dev-reminder/pathmeasure.png)
+![path取点](/images/2015-09-17-android-dev-reminder/pathmeasure.png)
 
 ##PathMeasure进行Path截取
 先看效果
-![example](/images/2015-09-17-android-dev-reminder/PathMeasure.gif)
+![path截取](/images/2015-09-17-android-dev-reminder/PathMeasure.gif)
 
 >**public boolean getSegment (float startD, float stopD, Path dst, boolean startWithMoveTo)**
 >
@@ -133,3 +133,51 @@ tags: [android]
 	
 	    invalidate();
 	}
+	
+##XML预览
+>**xmlns:tools="http://schemas.android.com/tools"**
+
+这个命名空间可以帮助我们更好的进行xml布局时的预览
+
+###tools中的属性不会打包到APK中
+它拥有android：中所有的属性，但它标识的属性仅仅在预览中有效，不会影响真正的运行结果。
+举个例子：
+
+    <TextView
+        android:text="Footer"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        />
+        
+这是我们之前的一个写法，把textView的text属性用android：来标识。如果我们希望这个textview的文字在代码中实时控制，默认是没文字怎么办？这就需要tools的帮助了。
+
+	<TextView
+        tools:text="Footer"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        />
+        
+把第一行的android替换为tools这样既可以能在预览中看到效果，又不会影响代码实际运行的结果。因为在实际运行的时候被tools标记的属性是会被忽略的。你完全可以理解为它是一个测试环境，这个测试环境和真实环境是完全独立的，不会有任何影响。
+
+**问题:** tools标签不支持代码提示，而且自己的属性也不能提示，全是靠自己记忆，或者先用android来代替，然后替换android为tools。
+
+###tools帮助预览listview等
+以前全靠脑补其中填充item的样子，借助tools可以进行item的预览
+
+
+	<?xml version="1.0" encoding="utf-8"?>
+	<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+	    xmlns:tools="http://schemas.android.com/tools"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    tools:listheader="@layout/header_list"
+	    tools:listitem="@layout/item_list"
+	    tools:listfooter="@layout/footer_list"
+	    />
+	    
+![listview预览](/images/2015-09-17-android-dev-reminder/tools.png)
+
+实验下来发现其实还是有问题 (环境: Android Studio 1.4)
+
+- 只有当ListView处于布局最底层时才显示item预览
+- footer貌似不能正常显示
