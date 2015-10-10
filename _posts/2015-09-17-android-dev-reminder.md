@@ -6,26 +6,26 @@ category: Develop
 tags: [android]
 ---
 
-记录一些Android开发相关的，不太关注到，但又很使用的小零碎。
+记录一些Android开发相关的，不太关注到，但又很实用的小零碎。
 
 ##PathMeasure进行Path取点
 通过PathMeasure可以计算出path上的各个点的坐标以及这个点的切线
 
 >**public boolean getPosTan (float distance, float[] pos, float[] tan)**
-
-**Description:**
-
-Pins distance to 0 <= distance <= getLength(), and then computes the corresponding position and tangent. Returns false if there is no path, or a zero-length path was specified, in which case position and tangent are unchanged.
-
-**Parameters:**
-
-- distance: The distance along the current contour to sample
-- pos: If not null, eturns the sampled position (x==[0], y==[1])
-- tan: If not null, returns the sampled tangent (x==[0], y==[1])
-
-**Returns:**
-
-- false if there was no path associated with this measure object
+>
+>**Description:**
+>
+>Pins distance to 0 <= distance <= getLength(), and then computes the corresponding position and tangent. Returns false if there is no path, or a zero-length path was specified, in which case position and tangent are unchanged.
+>
+>**Parameters:**
+>
+>- distance: The distance along the current contour to sample
+>- pos: If not null, eturns the sampled position (x==[0], y==[1])
+>- tan: If not null, returns the sampled tangent (x==[0], y==[1])
+>
+>**Returns:**
+>
+>- false if there was no path associated with this measure object
 
 例子代码:
 
@@ -71,4 +71,65 @@ Pins distance to 0 <= distance <= getLength(), and then computes the correspondi
 ![example](/images/2015-09-17-android-dev-reminder/pathmeasure.png)
 
 ##PathMeasure进行Path截取
-To be continue
+先看效果
+![example](/images/2015-09-17-android-dev-reminder/PathMeasure.gif)
+
+>**public boolean getSegment (float startD, float stopD, Path dst, boolean startWithMoveTo)**
+>
+>**Description:**
+>
+>Given a start and stop distance, return in dst the intervening segment(s). If the segment is zero-length, return false, else return true. startD and stopD are pinned to legal values (0..getLength()). If startD <= stopD then return false (and leave dst untouched). Begin the segment with a moveTo if startWithMoveTo is true
+
+具体实现就是一个值动画加上`PathMeasure.getSegment()`方法，从而不停的重绘而达成想要的效果。知道原理后可以YY出很多比较炫的效果。
+
+
+	@Override
+	protected void onDraw(Canvas canvas) {
+	    super.onDraw(canvas);
+	
+	    if (drawPath != null) {
+	        canvas.drawPath(drawPath, paint);
+	    }
+	
+	}
+	
+	public void drawWithStatus() {//可传参绘制不同状态
+	
+	    Point startPoint = new Point(width / 4, height / 2);
+	    Point endPoint = new Point(width * 3 / 4, height / 4);
+	
+	    Path path = new Path();
+	    path.moveTo(startPoint.x, startPoint.y);
+	    path.lineTo(width / 2, height * 3 / 4);
+	    path.lineTo(endPoint.x, endPoint.y);
+	    pathMeasure = new PathMeasure(path, false);
+	
+	    if (mPhareAnimator == null) {
+	        mPhareAnimator = ValueAnimator.ofFloat(0.0F, 1.0F);
+	        mPhareAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+	            @Override
+	            public void onAnimationUpdate(ValueAnimator animation) {
+	                float value = (Float) animation.getAnimatedValue();
+	                updatePrecess(value);
+	            }
+	        });
+	
+	        mPhareAnimator.setDuration(NORMAL_ANIMATION_DURATION);
+	        mPhareAnimator.setInterpolator(new LinearInterpolator());
+	    }
+	
+	    //清空canvas,重置值动画
+	    drawPath.reset();
+	    invalidate();
+	    mPhareAnimator.cancel();
+	    mPhareAnimator.start();
+	}
+	
+	public void updatePrecess(float process) {
+	    this.process = process;
+	    if (pathMeasure.getSegment(0, process * pathMeasure.getLength(), drawPath, true)) {
+	        drawPath.rLineTo(0, 0);//解决低版本可能出现的绘制问题
+	    }
+	
+	    invalidate();
+	}
