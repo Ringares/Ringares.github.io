@@ -138,6 +138,7 @@ tags: [android]
 	}
 	
 ##自定义控件状态
+
 ###res/values/新建一个xml文件：drawable_status.xml
 
 	<?xml version="1.0" encoding="utf-8"?>
