@@ -8,6 +8,14 @@ tags: [android]
 
 这一篇主要对Fresco个模块进行分别的说明(源码的分析有一部分会在代码中以注释的形式写出),过程中涉及到一些各模块的联系,东一句西一句的可能不太连贯.Fresco框架确实包含比较多的内容,对各模块有了解后,再走一遍初始化及请求流程可能就会比较清楚了.
 
+东西比较多,如有疏漏请多包涵啦~XD
+
+没有涉及如何使用和配置,具体如何使用,可参考:
+
+[http://fresco-cn.org/docs/getting-started.html](http://fresco-cn.org/docs/getting-started.html#_)
+
+[http://blog.happyhls.me/2015/08/03/fresco学习笔记/](http://blog.happyhls.me/2015/08/03/fresco学习笔记/)
+
 ##常用图片加载框架比较
 
 | 框架 | 出品 | 特点 |
@@ -15,12 +23,12 @@ tags: [android]
 |Universal ImageLoader|[nostra13](https://github.com/nostra13/Android-Universal-Image-Loader)|1.支持下载进度监听<br>2.可以在 View 滚动中暂停图片加载<br>3.默认实现多种内存缓存算法<br>4.支持本地缓存文件名规则定义|
 |Picasso|[square](https://github.com/square/picasso)|1.自带统计监控功能,包括缓存命中率,已使用内存大小等<br>2.支持优先级处理<br>3.支持飞行模式、并发线程数根据网络类型而变<br>4.自己没有实现本地缓存,交给okhttp实现,这样的好处是可以通过请求 Response Header 中的 Cache-Control 及 Expired 控制图片的过期时间|
 |Glide|[bumptech](https://github.com/bumptech/glide)|1.Glide 不仅是一个图片缓存，它支持 Gif、WebP、缩略图。甚至是 Video，所以更该当做一个媒体缓存<br>2.支持优先级处理<br>3.与 Activity/Fragment 生命周期一致，支持 trimMemory<br>4.支持 okhttp、Volley<br>5.内存缓存中有引用记数的设计<br>6.与 Activity/Fragment 生命周期一致，支持 trimMemory|
-|Fresco|[facebook](https://github.com/facebook/fresco)|1.Native 缓存,自动回收<br>2.支持JPEG的渐进式展现<br>3.支持Gif, WebP<br>4.自带圆角,自定义焦点裁切<br>5.多层绘制图片,支持例如点击显示图层及加载进度条等|
+|Fresco|[facebook](https://github.com/facebook/fresco)|1.Native 缓存,自动回收<br>2.支持JPEG的渐进式展现<br>3.支持Gif, WebP<br>4.自带圆角,自定义焦点裁切<br>5.多层绘制图片,支持例如点击显示图层及加载进度条等<br>5.官方没有说,但是看源码也有缓存命中的回调|
 
 [详情及具体分析可见](http://www.trinea.cn/android/android-image-cache-compare)
 
 ##Drawee模块
-Drawee模块用于展示图片,是一个完整的mvc架构.
+Drawee模块用于展示图片,是一个类mvc架构.
 
 - M -> DraweeHierarchy
 - V -> DraweeView
@@ -55,7 +63,7 @@ Drawee模块用于展示图片,是一个完整的mvc架构.
 	  super.setImageDrawable(mDraweeHolder.getTopLevelDrawable());
 	}
 
-**GenericDraweeView**的构造与GenericDraweeView相似,其中在`init()`方法中用到的`mSimpleDraweeControllerBuilder`,其实是在`Fresco.init()`最初的初始化时创建好的.
+**SimpleDraweeView**的构造与GenericDraweeView相似,其中在`init()`方法中用到的`sDraweeControllerBuilderSupplier`,其实是在`Fresco.init()`最初的初始化时创建好的.
 
 ###DraweeHierarchy的继承体系
 
@@ -731,43 +739,53 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	mProgressiveJpegView.setController(controller);
 
 ##内存管理
-Fresco最强大的地方在于它对图片资源的内存优化.在Android可以使用的堆内存之间的区别。Android中每个App的 Java堆内存大小都是被严格的限制的。每个对象都是使用Java的new在堆内存实例化，这是内存中相对安全的一块区域。内存有垃圾回收机制，所以当 App不在使用内存的时候，系统就会自动把这块内存回收。
+Fresco最强大的地方在于它对图片资源的内存优化.在Android中由java代码创建的对象存活在虚拟机中分配的内存里,这块内存受到严格的限制,在APP使用图片较多的情况下,会有泄露的风险,并且长期占用内存,导致可用内存不足,频繁GC,大大影响性能和流畅性.
 
-不幸的是，内存进行垃圾回收的过程正是问题所在。当内存进行垃圾回收时，内存不仅仅进行了垃圾回收，还把 Android 应用完全终止了。这也是用户在使用 App 时最常见的卡顿或短暂假死的原因之一。这会让正在使用 App 的用户非常郁闷，然后他们可能会焦躁地滑动屏幕或者点击按钮，但 App 唯一的响应就是：在 App 恢复正常之前，请求用户耐心等待
+[facebook的post, 简单描述了fresco的内存是如何管理的(需要翻墙)](https://code.facebook.com/posts/366199913563917/introducing-fresco-a-new-image-library-for-android/)
 
-相比之下，Native堆是由C++程序的new进行分配的。在Native堆里面有更多可用内存，App只被设备的物理可用内存限制，而且没有垃圾回收机制或其他东西拖后腿。但是c++程序员必须自己回收所分配的每一块内存，否则就会造成内存泄露，最终导致程序崩溃。
+Fresco则是利用了**ashmem**, ashmem的操作类似于Native堆的申请释放操作, 但是有系统提供的调用方法.Android可以"解锁"(unpin)内存而不是释放(free)它,这部分unping的内存处于一个懒释放(lazy free)类似软引用的状态,也就是说只有当系统真的需要更多的内存时,才回去真正释放这部分内存.而当android去锁定(pin)这部分内存时,如果没有被释放,那么数据就任然存在.
 
-Android有另外一种内存区域，叫做Ashmem。它操作起来更像Native堆，但是也有额外的系统调用。Android 在操作 Ashmem 堆时，会把该堆中存有数据的内存区域从 Ashmem 堆中抽取出来，而不是把它释放掉，这是一种弱内存释放模式；被抽取出来的这部分内存只有当系统真正需要更多的内存时（系统内存不够用）才会被释放。当 Android 把被抽取出来的这部分内存放回 Ashmem 堆，只要被抽取的内存空间没有被释放，之前的数据就会恢复到相应的位置。
+更多ashmem的知识可参见
 
-可消除的Bitmap
-Ashmem不能被Java应用直接处理，但是也有一些例外，图片就是其中之一。当你创建一张没有经过压缩的Bitmap的时候，Android的API允许你指定是否是可清除的。
+[Android系统匿名共享内存Ashmem（Anonymous Shared Memory）简要介绍和学习计划](http://blog.csdn.net/luoshengyang/article/details/6651971)
 
-	BitmapFactory.Options = new BitmapFactory.Options();
+[Android系统匿名共享内存Ashmem（Anonymous Shared Memory）驱动程序源代码分析](http://blog.csdn.net/luoshengyang/article/details/6664554)
+
+[Android系统匿名共享内存Ashmem（Anonymous Shared Memory）在进程间共享的原理分析](http://blog.csdn.net/luoshengyang/article/details/6666491)
+
+###Bitmap在Ashmem中的使用
+Ashmem内存区域是不能被Java应用直接使用的,但这其中有一些例外,而Bitmap是其中一个.
+
+	BitmapFactory.Osptions = new BitmapFactory.Options();
 	options.inPurgeable = true;
 	Bitmap bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length, options);
+	
+Purgeable被设置成true以后,这个Bigmap就是保存在Ashmem内存区域中的,Java的垃圾回收是不能回收这篇区域的内存的.当Android系统需要渲染这个Bitmap的时候,会调用pin,渲染完成后会调用unpin.而unpin后的内存空间表示能被其他人所使用.
 
-经过上面的代码处理后，可清除的Bitmap会驻留在 Ashmem 堆中。不管发生什么，垃圾回收器都不会自动回收这些 Bitmap。当 Android 绘制系统在渲染这些图片，Android 的系统库就会把这些 Bitmap 从 Ashmem 堆中抽取出来，而当渲染结束后，这些 Bitmap 又会被放回到原来的位置。如果一个被抽取的图片需要再绘制一次，系统仅仅需要把它再解码一次，这个操作非常迅速。
+如果被unpin的Bitmap需要重新渲染,系统会再次Decode这个Bitmap.**而这个Decode的过程是在UI线程上完成的,这个操作也大大增加了CPU的负担**.所以Google后来废弃了这个pureable的参数.
 
-这听起来像一个完美的解决方案，但是问题是Bitmap解码的操作是运行在UI线程的。Bitmap解码是非常消耗CPU资源的，当消耗过大时会引起UI阻塞。因为这个原因，所以Google不推荐使用这个特性。 现在它们推荐使用另外一个特性——inBitmap。但是这个特性直到Android3.0之后才被支持。即使是这样，这个特性也不是非常有用，除非 App 里的所有图片大小都相同，这对Fackbook来说显然是不适用的。一直到4.4版本，这个限制才被移除了。但我们需要的是能够运行在 Android 2.3 - 最新版本中的通用解决方案。
+后来Google提供了另外一个Flag,叫inBitmap.很遗憾的是,知道Android4.4后,这个新的Flag才得到完善.而Fresco致力于实现一个包括Android2.3以及以上的Android系统都能完美工作的图片加载管理开源库,因此Fresco放弃了使用inBitmap的解决方案.
 
-自力更生
-对于上面提到的“解码操作致使 UI 假死”的问题，我们找到了一种同时使 UI 显示和内存管理都表现良好的解决方法。如果我们在 UI 线程进行渲染之前把被抽取的内存区域放回到原来的位置，并确保它再也不会被抽取，那我们就可以把这些图片放在 Ashmem 里，同时不会出现 UI 假死的问题。幸运的是，Android 的 NDK 中有一个函数可以完美地实现这个需求，名字叫做 AndroidBitmap_lockPixels。这个函数最初的目的就是：在调用 unlockPixels 再次抽取内存区域后被执行。
+###Fresco是如何利用Ashmem去给Bitmap分配和管理内存?
+上面说到的pin和unpin两个操作,对应的NDK调用是AndroidBitmap_lockPixels和unlockPixels.按照我们一惯认知,为了避免内存泄漏,这两者必须成对出现.而Fresco为了避免Bitmap再次渲染而导致的在UI线程Decode的过程,偏偏不在渲染完成后调用unlockPixels.
 
-当我们意识到我们没有必要这样做的时候，我们取得了突破。如果我们只调用lockPixels而不调用对应的unlockPixels，那么我们就 可以在Java的堆内存里面创建一个内存安全的图像，并且不会导致UI线程加载缓慢。只需要几行c++代码，我们就完美的解决了这个问题。
+这样做后,Fresco需要自己去管理这块内存区域,保证当这个Bitmap不再使用时,Ashmem的内存空间能被unpin.而Fresco选择在Bitmap离开屏幕可视范围时候(onDetachWindow等时候),去做unpin.
 
-用C++的思想写Java代码
-就像《蜘蛛侠》里面说的：“能力越强，责任越大。”可清除的 Bitmap 既不会被垃圾回收器回收，也不会被 Ashmem 内置的清除机制处理，这使得使用它们可能会造成内存泄露。所以我们只能靠自己啦。
+这些都在SImpleDraweeView中封装好了,也就是说一般情况下我们使用SimpleDraweeView就行了,不太需要担心内部的处理.
 
-在c++中,通常的解决方案是建立智能指针类,实现引用计数。这些需要利用到c++的语言特性——拷贝构造函数、赋值操作符和确定的析构函数。这种语法在Java之中不存在，因为垃圾回收器能够处理这一切。所以我们必须以某种方式在Java中实现C++的这些保证机制。
 
-我们创建了两个类去完成这件事。其中一个叫做“SharedReference”，它有addReference和deleteReference 两个方法，调用者调用时必须采取基类对象或让它在范围之外。一旦引用计数器归零，资源处理(Bitmap.recycle)就会发生。
+###不同版本不同对策
+由Fresco文档和`com.facebook.imagepipeline.platform.PlatformDecoder`源码可知,Fresco对不同的系统版本使用了不用的内存处理策略
 
-然而，很显然，让Java开发者去调用这些方法是很容易出错的。Java语言就是为了避免做这样的事情的！所以SharedReference之 上,我们构建了CloseableReference类。它不仅实现了Java的Closeable接口,而且也实现了Cloneable接口。它的构造 器和clone()方法会调用addReference()，而close()方法会调用deleteReference()。所以Java开发者需要遵 守下面两条简单的的规则：
+- 在5.0 SDK21 Lolopop以下的系统,使用ashmem
+- 在5.0 及以上系统使用了ART虚拟机,相比之下,内存管理有了很大改进,所以Bitmap缓存直接位于Java的heap上
 
-在分配CloseableReference新对象的时候,调用.clone()。
+##总结
+如果不算ashmem的purgable,fresco还用到了三个缓存,首先是DiskCache,然后还有两个MemoryCache,分别是保存DecodedBitmap的和保存EncodedImage的缓存,除此之外,为了避免频繁的申请内存,回收内存造成内存抖动,fresco还用到了大量的对象池(基于`com.facebook.imagepipeline.memory.BasePool`),除此以外,还有`com.facebook.common.references.OOMSoftReference`使用软引用的地方.
 
-在超出作用域范围的时候，调用.close()，这通常是在finally代码块中。
+这些细节的东西暂时先留个坑吧,以后再看@@
 
-这些规则可以有效地防止内存泄漏,并让我们在像Fackbook的Android客户端这种大型的Java程序中享受Native内存管理和通信。
+
+
 
 
