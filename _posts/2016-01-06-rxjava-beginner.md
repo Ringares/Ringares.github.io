@@ -190,26 +190,93 @@ RxJava的优势相较于传统的异步回调, AsyncTask或者Handler来说要�
 RxJava提供了对事件序列进行变换的支持, 这一点也是大多数人觉得RxJava很好用的原因之一.
 
 ###map
+最基本的变换,可理解为一对一的映射
+
+	/**
+	 * map()操作符 一对一的转换
+	 * <p/>
+	 * 这里出现了一个叫做 Func1 的类。它和 Action1 非常相似，也是 RxJava 的一个接口，用于包装含有一个参数的方法。
+	 * Func1 和 Action 的区别在于， Func1 包装的是有返回值的方法
+	 * <p/>
+	 * <p/>
+	 * <p/>
+	 * -----------------------------------------------------
+	 * 可以看到，map() 方法将参数中的 String 对象转换成一个 Bitmap 对象后返回，
+	 * 而在经过 map() 方法后，事件的参数类型也由 String 转为了 Bitmap。
+	 * 这种直接变换对象并返回的，是最常见的也最容易理解的变换。
+	 * 不过 RxJava 的变换远不止这样，它不仅可以针对事件对象，还可以针对整个事件队列，这使得 RxJava 变得非常灵活。
+	 */
+	public void testMap() {
+	    Observable.just("images/logo.png") // 输入类型 String
+	            .map(new Func1<String, Bitmap>() {
+	                @Override
+	                public Bitmap call(String filePath) { // 参数类型 String
+	                    return getBitmapFromPath(filePath); // 返回类型 Bitmap
+	                }
+	            })
+	            .subscribe(new Action1<Bitmap>() {
+	                @Override
+	                public void call(Bitmap bitmap) { // 参数类型 Bitmap
+	                    getShowBitmap(bitmap);
+	                }
+	            });
+	}
 
 ![map](/images/2016-01-06-rxjava-beginner/map.png)
 
 ###flatMap
+也是最基本的,一对多的变换,但注意由下图可见,不保证变换后顺序的一致性.
+
+	/**
+	 * flatMap() 一对多的转换
+	 */
+	public void testFlatMap() {
+	    Student[] students = {new Student(), new Student()};
+	    Observable.from(students)
+	            .flatMap(new Func1<Student, Observable<Course>>() {
+	                @Override
+	                public Observable<Course> call(Student student) {
+	                    return Observable.from(student.getCourses());
+	                }
+	            })
+	            .subscribe(new Action1<Course>() {
+	                @Override
+	                public void call(Course course) {
+	                    System.out.println(course.getName());
+	                }
+	            });
+	}
+	
+	public class Student {
+	    List<Course> courses;
+	    public List<Course> getCourses() {
+	        return courses;
+	    }
+	}
 
 ![flatMap](/images/2016-01-06-rxjava-beginner/flatmap.png)
 
 ###buffer
+时间段内的事件打包成`List<Event>`发送出去.
 
 ![buffer](/images/2016-01-06-rxjava-beginner/buffer.png)
 
 ###debounce
+在接受到事件A发出的一段时间内,都没有后续的事件,经过这段缓冲的时间后再,往下发送事件A.
+
+应用场景: 搜索框内输入文字,当输入停止300ms后进行查询请求等...
 
 ![debounce](/images/2016-01-06-rxjava-beginner/debounce.png)
 
 ###throttleFirst
+在接受到事件A发出的一段时间内,屏蔽其它事件,直到这个时间结束,也就是说,一段时间内,只往下发送最先接到的事件.
+
+应用场景: 按钮多次点击的响应等(手抖克星)...
 
 ![throttleFirst](/images/2016-01-06-rxjava-beginner/throttlefirst.png)
 
 ###filter
+根据条件对事件进行过滤.
 
 ![filter](/images/2016-01-06-rxjava-beginner/filter.png)
 
@@ -245,3 +312,6 @@ Scheduler(调度器)在Rx中起到举足轻重的作用,一手包揽了线程切
 	    super.onPause();
 	    RxUtils.unsubscribe(subscriptions);
 	}
+	
+##RxBus
+to be continued~
