@@ -1,22 +1,39 @@
-@media (min-width:979px) {
-	body {
-		padding-top: 60px;
-	}
+body {
+	font-family: "Microsoft YaHei", "Helvetica Neue", Helvetica, "Nimbus Sans L", Arial, "Liberation Sans", "PingFang SC", "Hiragino Sans GB", "Source Han Sans CN", "Source Han Sans SC", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, "WenQuanYi Zen Hei Sharp", sans-serif;
+	padding-top: 60px;
 }
-@media (max-width: 978px) {
-	body {
-		padding-top: 0px;
-	}
+
+.page-header {
+	margin: 20px 0px;
+}
+
+ol, ul {
+	padding-left: 20px;
 }
 
 h2 {
-  padding-bottom: 0.3em;
+	padding: 0.3em 0em 0.3em 0.5em;
+
 	margin-top: 1em;
-	margin-bottom: 16px;
+	margin-bottom: 1em;
   font-size: 1.75em;
 	font-weight: bold;
   line-height: 1.225;
   border-bottom: 1px solid #eee;
+	border-left: 15px solid #2e9fff;
+}
+
+.mobilepadding {
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+.searchresult {
+	display:none;
+	padding: 20px;
+	-webkit-box-shadow: 2px 2px 15px 0px rgba(204,204,204,1);
+	-moz-box-shadow: 2px 2px 15px 0px rgba(204,204,204,1);
+	box-shadow: 2px 2px 15px 0px rgba(204,204,204,1);
 }
 
 .post-meta {
@@ -44,11 +61,8 @@ h2 {
 	background: transparent;
 }
 
-.navbar .nav {
-}
-
-.navbar-inner {
-	background: rgba(255,255,255,0.5);
+.navbar {
+	background: rgba(248,248,248,0.8);
 }
 
 /* posts index */
@@ -70,6 +84,9 @@ h2 {
   margin-bottom: 20px;
   font-weight: bold; }
 
+ul.tag_box {
+	padding-left: 0px;
+}
 /* tag_box */
 .tag_box {
   list-style: none;
@@ -111,17 +128,44 @@ p {
 	text-align: justify;
 }
 
-.span8 p img{
+p img{
 	display: block;
-	margin-left: auto;
-	margin-right: auto;
+	margin: 0 auto;
+	border-radius: 3px;
+	box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+	max-width: 100%;
 }
+
+.post-content p img.emoji{
+	display: inline;
+}
+
+.post-content a[target="_blank"]:after {
+  content: url(../Icon_External_Link.png);
+  margin: 0 0 0 5px;
+}
+/*
+.post-content a[href^="//"]:after,
+.post-content a[href^="http://"]:after,
+.post-content a[href^="https://"]:after {
+  content: url(http://upload.wikimedia.org/wikipedia/commons/6/64/Icon_External_Link.png);
+  margin: 0 0 0 5px;
+}
+
+.post-content a[href^="//einverne.github.io/"]:after,
+.post-content a[href^="http://einverne.github.io/"]:after,
+.post-content a[href^="https://einverne.github.io/"]:after {
+  content: '';
+  margin: 0;
+}
+*/
 
 .nav {
   font-size: 110%;
 }
+
 .nav-icon{
-	padding: 5px 15px 5px;
+	padding: 10px 15px 10px;
 	float: right;
 }
 /*http://meta.superuser.com/questions/4788/css-for-the-new-kbd-style*/
@@ -151,18 +195,18 @@ blockquote{
   padding: 15px 20px 15px 45px;
   margin: 0 0 20px;
   position: relative;
-  
+
   /*Font*/
   font-family: Georgia, serif;
   font-size: 16px;
   line-height: 1.2;
   color: #444;
   text-align: justify;
-  
+
   /*Borders - (Optional)*/
   border-left: 15px solid #c76c0c;
   border-right: 2px solid #c76c0c;
-  
+
   /*Box Shadow - (Optional)*/
   -moz-box-shadow: 2px 2px 15px #ccc;
   -webkit-box-shadow: 2px 2px 15px #ccc;
@@ -171,13 +215,13 @@ blockquote{
 
 blockquote::before{
   content: "\201C"; /*Unicode for Left Double Quote*/
-  
+
   /*Font*/
   font-family: Georgia, serif;
   font-size: 60px;
   font-weight: bold;
   color: #999;
-  
+
   /*Positioning*/
   position: absolute;
   left: 10px;
@@ -206,4 +250,17 @@ blockquote a:hover{
 	line-height: 1.4;
 	margin: 1.5em 10px;
 	padding: 0.5em 10px;
+}
+
+.footnotes{
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: #bbb 2px dotted;
+}
+
+.anchorjs-link {
+  transition: all .25s linear;
+}
+*:hover > .anchorjs-link {
+  margin-left: 0.5em !important;
 }
