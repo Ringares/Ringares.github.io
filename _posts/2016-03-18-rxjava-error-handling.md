@@ -2,7 +2,7 @@
 layout: post
 title: "RxJava Error处理"
 description: "RxJava Error Handling"
-category: Develop 
+category: Develop
 tags: [RxJava]
 ---
 
@@ -16,12 +16,12 @@ tags: [RxJava]
 	    System.out::println,
 	    error -> System.out.println("Error!")
 	  );
-	 
+
 而在某个变换操作中先捕获的异常,则通常有两种处理方式
 
 	//假如有方法如下抛出 IOException
-	String transform(String input) throws IOException; 
-	
+	String transform(String input) throws IOException;
+
 	//第一种,返回值的,仍是抛出RuntimeException
 	Observable.just("Hello!")  
 	  .map(input -> {
@@ -31,7 +31,7 @@ tags: [RxJava]
 	      throw Exceptions.propagate(t);
 	    }
 	  })
-	  
+
 	//第二种,返回Observable的,直接返回 Observable.error(t)
 	Observable.just("Hello!")  
 	  .flatMap(input -> {

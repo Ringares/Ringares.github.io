@@ -20,20 +20,20 @@ tags: [RxJava]
 	Observable<Data> memory = ...;  
 	Observable<Data> disk = ...;  
 	Observable<Data> network = ...;
-	
+
 	// Retrieve the first source with data
 	Observable<Data> source = Observable  
 	  .concat(memory, disk, network)
 	  .first();
-	  
+
 需要注意的是 `concat` 中Observable 的顺序,因为是依次被执行的.
 下一步要完善的是缓存的功能,在从disk或network加载数据后,要对数据进行缓存.
-	
+
 	Observable<Data> networkWithSave = network.doOnNext(data -> {  
 	  saveToDisk(data);
 	  cacheInMemory(data);
 	});
-	
+
 	Observable<Data> diskWithCache = disk.doOnNext(data -> {  
 	  cacheInMemory(data);
 	});
