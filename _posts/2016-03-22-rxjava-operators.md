@@ -8,18 +8,6 @@ tags: [RxJava]
 
 记录用到的变换操作符和使用场景,以及一些遇到的Tips
 
-##基础Operator
-
-###cast
-![cast](/images/2016-03-22-rxjava-operators/cast.png)
-
->Returns an Observable that emits the items emitted by the source Observable, converted to the specified type.  
->
-
-**相关**
-
-`map`:和cast的区别在于,cast可以将源头Observable发出的数据转成其它类型.
-
 ##功能性的Operator
 
 ##过滤作用的Operator
