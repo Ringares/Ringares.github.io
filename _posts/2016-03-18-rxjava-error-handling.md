@@ -44,7 +44,7 @@ tags: [RxJava]
 
 原则上, `onError` 是用来处理发生十分严重的问题,而导致序列终断的情况.而如果需要在错误发生的时候进行下一步操作 `onNext` (假如有多个数据源,依次被请求,对某个数据源的请求失败了,还需要继续请求下一个的情况),这种情况该如何处理.
 
-###onErrorReturn & onErrorResumeNext
+### onErrorReturn & onErrorResumeNext
 可能有一下几种途径:
 
 - [onErrorReturn()](http://reactivex.io/RxJava/javadoc/rx/Observable.html#onErrorReturn(rx.functions.Func1)
@@ -53,7 +53,7 @@ tags: [RxJava]
 ![onErrorReturn](/images/2016-03-18-rxjava-error-handling/onErrorReturn.png)
 ![onErrorResumeNext](/images/2016-03-18-rxjava-error-handling/onErrorResumeNext.png)
 
-###retry
+### retry
 需要注意的是,`retry` 虽然可以方便的在遇到错误时重试,但最终返回的结果序列会重复的包括发生错误之前的部分.
 
 	Observable.interval(1, TimeUnit.SECONDS)  

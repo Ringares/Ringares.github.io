@@ -16,7 +16,7 @@ tags: [android]
 
 [http://blog.happyhls.me/2015/08/03/fresco学习笔记/](http://blog.happyhls.me/2015/08/03/fresco学习笔记/)
 
-##常用图片加载框架比较
+## 常用图片加载框架比较
 
 | 框架 | 出品 | 特点 |
 |    ---    |    :---:    |    ---    |
@@ -27,7 +27,7 @@ tags: [android]
 
 [详情及具体分析可见](http://www.trinea.cn/android/android-image-cache-compare)
 
-##Drawee模块
+## Drawee模块
 Drawee模块用于展示图片,是一个类mvc架构.
 
 - M -> DraweeHierarchy
@@ -45,7 +45,7 @@ Drawee模块用于展示图片,是一个类mvc架构.
 - DraweeHierarchy提供获取顶层drawable的方法
 - DraweeController接收并处理DraweeView通过DraweeHolder传递过来的Attach/Detach/TouchEvent事件
 
-###DraweeView的继承体系
+### DraweeView的继承体系
 
 ![draweehierarchy](/images/2015-12-02-study-of-fresco/DraweeView.png)
 
@@ -65,7 +65,7 @@ Drawee模块用于展示图片,是一个类mvc架构.
 
 **SimpleDraweeView**的构造与GenericDraweeView相似,其中在`init()`方法中用到的`sDraweeControllerBuilderSupplier`,其实是在`Fresco.init()`最初的初始化时创建好的.
 
-###DraweeHierarchy的继承体系
+### DraweeHierarchy的继承体系
 
 ![draweehierarchy](/images/2015-12-02-study-of-fresco/DraweeHierarchy.png)
 
@@ -88,28 +88,28 @@ Drawee模块用于展示图片,是一个类mvc架构.
 
 	//这些方法只能被Controller调用
 	void reset();
-	
+
 	void setImage(Drawable drawable, float progress, boolean immediate);
-	
+
 	void setProgress(float progress, boolean immediate);
-	
+
 	void setFailure(Throwable throwable);
-	
+
 	void setRetry(Throwable throwable);
-	
+
 	void setControllerOverlay(Drawable drawable);
 
 
 **GenericDraweeHierarchy**是SettableDraweeHierarchy接口的通用实现类, 是DraweeView中真正持有的实体
 
 
-###DraweeController的继承体系
+### DraweeController的继承体系
 
 ![DraweeController](/images/2015-12-02-study-of-fresco/DraweeController.png)
 
 **DraweeController**接口定义了两件事
 
-- 获取和设置Hieraychy 
+- 获取和设置Hieraychy
 - view的各种事件通知过来，controller来控制这些逻辑的操作（onAttach/onDetach/onTouchEvent/getAnimatable）
 
 **AbstractDraweeController**抽象的接口实现类
@@ -120,7 +120,7 @@ Drawee模块用于展示图片,是一个类mvc架构.
 具体来说, (以PipelineDraweeController为例)在通过builder.build()创建Controller的过程中,会调用`obtainDataSourceSupplier`来获取所需的DataSourceSupplier,进而在请求图片(submitRequest)的过程中获取当前的DataSource. 而通过在DataSource中订阅DataSourceSubscriber,使得请求到的数据在改变时能够通过controller将获取到的图片或者中间结果传递到DraweeHierarchy中,最终显示出来(...写得有点绕...x_x),对这个过程有个大概的了解有助于于之后[DataSource](#jump2datasource)模块进行连接
 
 具体代码:
-	
+
 	//图片被attach到界面是,开始请求
 	public void onAttach() {
 	  if (FLog.isLoggable(FLog.VERBOSE)) {
@@ -136,7 +136,7 @@ Drawee模块用于展示图片,是一个类mvc架构.
 	  	submitRequest();
 	  }
 	}
-	
+
 	//具体请求如何被发送的
 	protected void submitRequest() {
 	  mEventTracker.recordEvent(Event.ON_DATASOURCE_SUBMIT);
@@ -187,14 +187,14 @@ Drawee模块用于展示图片,是一个类mvc架构.
 	  //向DataSource订阅!!!这里在DataSource的部分再细讲
 	  mDataSource.subscribe(dataSubscriber, mUiThreadImmediateExecutor);
 	}
-	
+
 接下来就是**AbstractDraweeController**的实现类,分别是
 
 - **PipelineDraweeController**: Fresco默认的实现,也就是SimpleDraweeView中使用的, 用来桥接`image pipeline`和 `SettableDraweeHierarchy`
 - **VolleyDraweeController**: 用来桥接`volley`和`SettableDraweeHierarchy`,按照注释的意思,也就是说如果我们要使用Volley来做网络请求的话,需要用到这种controller(还没仔细研究这里,只是猜测~)
 
-	
-##DataSource模块
+
+## DataSource模块
 <span id="jump2datasource">DataSource</span>接口类似于Java中的Future(为了返回异步任务的结果),其区别在于Future只能返回最终的结果,**而DataSource的设计使其能返回一系列结果(例如渐进式的显示图片,或者加载图片过程中不同状态的显示)**
 
 这个类图可以回头再看..
@@ -208,13 +208,13 @@ DataSubscriber和DataSource 一起构成观察者模式.DataSource提供了注�
 	//dataSource.getResult()获取结果
 	//dataSource.isFinished()判断是否是最终结果
 	void onNewResult(DataSource<T> dataSource);
-	
+
 	//pipeline中有错误时呗调用
 	void onFailure(DataSource<T> dataSource);
-	
+
 	//request被取消时调用
 	void onCancellation(DataSource<T> dataSource);
-	
+
 	//进度更新时被调用
 	void onProgressUpdate(DataSource<T> dataSource);
 
@@ -249,9 +249,9 @@ DataSubscriber和DataSource 一起构成观察者模式.DataSource提供了注�
 	  if (mDataSourceSupplier != null) {
 	    return mDataSourceSupplier;
 	  }
-	
+
 	  Supplier<DataSource<IMAGE>> supplier = null;
-	
+
 	  // final image supplier;
 	  //图片最终显示的的datasource的suppiler,分为两种
 	  //1.只有一个请求地址的
@@ -262,7 +262,7 @@ DataSubscriber和DataSource 一起构成观察者模式.DataSource提供了注�
 	  } else if (mMultiImageRequests != null) {
 	    supplier = getFirstAvailableDataSourceSupplier(mMultiImageRequests, mTryCacheOnlyFirst);
 	  }
-	
+
 	  // increasing-quality supplier; highest-quality supplier goes first
 	  //Fresco支持双分辨率的请求,传入高低不同分辨率的两个请求地址,会依次获取数据,提高低网速下的体验.这里就是添加低分辨率的request.
 	  if (supplier != null && mLowResImageRequest != null) {
@@ -271,17 +271,17 @@ DataSubscriber和DataSource 一起构成观察者模式.DataSource提供了注�
 	    suppliers.add(getDataSourceSupplierForRequest(mLowResImageRequest));
 	    supplier = IncreasingQualityDataSourceSupplier.create(suppliers);
 	  }
-	
+
 	  // no image requests; use null data source supplier
 	  if (supplier == null) {
 	    supplier = DataSources.getFailedDataSourceSupplier(NO_REQUEST_EXCEPTION);
 	  }
-	
+
 	  return supplier;
 	}
 
 具体这个请求是怎么发送出去的呢?之前有讲到在DraweeController的`onAttach`中获取了dataSource并且订阅了观察者,用于处理datasource返回的结果.来看一下实现中这个dataSource到底是怎么获取的:
-	
+
 	//controller中从DataSourceSupplier中get一个datasource, 这个suppiler就是上一段代码中,为controller获取的适当的dataSourceSuppiler
 	//从 supplier = getDataSourceSupplierForRequest(mImageRequest) 进入
 
@@ -291,21 +291,21 @@ DataSubscriber和DataSource 一起构成观察者模式.DataSource提供了注�
 	  ...
 	  return mDataSourceSupplier.get();
 	}
-	
-	
-	
+
+
+
 	/** Creates a data source supplier for the given image request. */
 	protected Supplier<DataSource<IMAGE>> getDataSourceSupplierForRequest(REQUEST imageRequest) {
 	  return getDataSourceSupplierForRequest(imageRequest, /* bitmapCacheOnly */ false);
 	}
-	
+
 	/** Creates a data source supplier for the given image request. */
 	protected Supplier<DataSource<IMAGE>> getDataSourceSupplierForRequest(
 	    final REQUEST imageRequest,
 	    final boolean bitmapCacheOnly) {
 	  final Object callerContext = getCallerContext();
 	  return new Supplier<DataSource<IMAGE>>() {
-	  
+
 	    //所以controller中从DataSourceSuppiler中获取DataSource就是下面这个,再往下看具体的实现
 	    @Override
 	    public DataSource<IMAGE> get() {
@@ -331,10 +331,10 @@ DataSubscriber和DataSource 一起构成观察者模式.DataSource提供了注�
 	    return mImagePipeline.fetchDecodedImage(imageRequest, callerContext);
 	  }
 	}
-	
+
 可见是通过Pipeline来获取的这个datasource.其内部是发起了一个`submitFetchRequest`返回一个DataSource.Pipeline也是Fresco一个重要的组成部分,在Pipline模块中详细说明.
 
-##Pipeline模块
+## Pipeline模块
 简单来说pipeline就是实现了三级缓存,解码,变形等等,完成了提供可呈现图片的所有工作.
 
 ![ImagePipeline](/images/2015-12-02-study-of-fresco/ImagePipeline.png)
@@ -372,7 +372,7 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	    return DataSources.immediateFailedDataSource(exception);
 	  }
 	}
-	
+
 	//******************************
 	//1.第一步 getDecodedImageProducerSequence
 	//******************************
@@ -388,12 +388,12 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	    return pipelineSequence;
 	  }
 	}
-	
+
 	//从这里就可以清楚地看到,针对不同的uri类型生成了不同的FetchSequence也就是Producer
 	private Producer<CloseableReference<CloseableImage>> getBasicDecodedImageSequence(
 	    ImageRequest imageRequest) {
 	  Preconditions.checkNotNull(imageRequest);
-	
+
 	  Uri uri = imageRequest.getSourceUri();
 	  //判空
 	  Preconditions.checkNotNull(uri, "Uri is null.");
@@ -420,7 +420,7 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	    ...
 	  }
 	}
-	
+
 拿最复杂的`getNetworkFetchSequence()`举例,追踪进去看代码就是对不同模块producer一层一层的包装(内存中获取->切换Thread->...编码缓存->本地缓存->webP转换->从网络请求),运用典型的装饰设计模式.
 
     //******************************
@@ -457,11 +457,11 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	    return DataSources.immediateFailedDataSource(exception);
 	  }
 	}
-	
+
 主要看下`CloseableProducerToDataSourceAdapter.create(...)`,创建了一个可关闭的producer到数据源的适配器,接下来要详细说明下producer和datasource之间处理逻辑.
 
-###Producer与DataSource的关联
-    
+### Producer与DataSource的关联
+
     //接着上一段代码
 	public static <T> DataSource<CloseableReference<T>> create(
 	    Producer<CloseableReference<T>> producer,
@@ -478,7 +478,7 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	  //构造里,只是调用了父类的方法
 	  super(producer, settableProducerContext, listener);
 	}
-	
+
 	//父类 AbstractProducerToDataSourceAdapter的构造
 	//关键的代码:
 	protected AbstractProducerToDataSourceAdapter(
@@ -496,7 +496,7 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	  //!!!而我们最后会讲到createConsumer(),最终的结果会传递到这个consumer中,记一下,之后会讲到
 	  producer.produceResults(createConsumer(), settableProducerContext);
 	}
-	
+
 为了研究`producer.produceResults()`生产的具体结果,我们举例来看一下
 **BitmapMemoryCacheProducer**,这是图片内存存取的producer
 
@@ -505,16 +505,16 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	public void produceResults(
 	    final Consumer<CloseableReference<CloseableImage>> consumer,
 	    final ProducerContext producerContext) {
-	
+
 	  final ProducerListener listener = producerContext.getListener();
 	  final String requestId = producerContext.getId();
 	  listener.onProducerStart(requestId, getProducerName());
 	  final ImageRequest imageRequest = producerContext.getImageRequest();
 	  final CacheKey cacheKey = mCacheKeyFactory.getBitmapCacheKey(imageRequest);
-	  
+
 	  //根据cacheKey在内存中查找
 	  CloseableReference<CloseableImage> cachedReference = mMemoryCache.get(cacheKey);
-	
+
 	  if (cachedReference != null) {
 	    //如果存在在内存中,直接通知consumer
 	    boolean isFinal = cachedReference.get().getQualityInfo().isOfFullQuality();
@@ -531,7 +531,7 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	      return;
 	    }
 	  }
-	
+
 	  //如果内存中没有,并且请求的最低等级=BITMAP_MEMORY_CACHE,则返回consumer一个空结果
 	  if (producerContext.getLowestPermittedRequestLevel().getValue() >=
 	      ImageRequest.RequestLevel.BITMAP_MEMORY_CACHE.getValue()) {
@@ -542,7 +542,7 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	    consumer.onNewResult(null, true);
 	    return;
 	  }
-	
+
 	  //需要inputProducer来提供,也就是调用前一个producer的produceResults的方法,同样的,如果有结果的话通过consumer(这里是wrappedConsumer来返回),需要的还可以继续要求再之前的producer来提供结果
 	  Consumer<CloseableReference<CloseableImage>> wrappedConsumer = wrapConsumer(consumer, cacheKey);
 	  listener.onProducerFinishWithSuccess(
@@ -551,9 +551,9 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	      listener.requiresExtraMap(requestId) ? ImmutableMap.of(VALUE_FOUND, "false") : null);
 	  mInputProducer.produceResults(wrappedConsumer, producerContext);
 	}
-	
+
 	//Q:wrappedConsumer是个啥东西?
-	
+
 	//如下: 从名字就可以看出是个代理或者委托的模式,也就是说现在的produser要求它前面的producer提供结果,前面的producer将结果传给wrappedConsumer,这是就可以先做一部分出里,再传递给当前的consumer
 	//以下面这个内存存取的producer的consumer委托为例,就是在返回最终结果的时候,在内存中进行了缓存.
 	//如果不需要对结果做处理的话,就直接传递原始的consumer到另一个producer就行
@@ -622,17 +622,17 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	    protected void onNewResultImpl(@Nullable T newResult, boolean isLast) {
 	      AbstractProducerToDataSourceAdapter.this.onNewResultImpl(newResult, isLast);
 	    }
-	
+
 	    @Override
 	    protected void onFailureImpl(Throwable throwable) {
 	      AbstractProducerToDataSourceAdapter.this.onFailureImpl(throwable);
 	    }
-	
+
 	    @Override
 	    protected void onCancellationImpl() {
 	      AbstractProducerToDataSourceAdapter.this.onCancellationImpl();
 	    }
-	
+
 	    @Override
 	    protected void onProgressUpdateImpl(float progress) {
 	      AbstractProducerToDataSourceAdapter.this.setProgress(progress);
@@ -642,10 +642,10 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 
 可见consumer中最终调用的是适配器的几个接口实现方法,而在适配器中直接调用了父类`AbstractDataSource`的方法,也就是通知了所有的订阅者,**这样就将所有的模块全部串联起来了**. **Well Done!!**
 
-	
-##Fresco初始化过程
 
-###初始化ImagePipelineFactory
+## Fresco初始化过程
+
+### 初始化ImagePipelineFactory
 需要在使用Drawee之前进行初始化,一般就在`Application.onCreate()`中进行
 
 	/** Initializes Fresco with the default config. */
@@ -653,7 +653,7 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	  ImagePipelineFactory.initialize(context);
 	  initializeDrawee(context);
 	}
-	
+
 	/** Initializes Fresco with the specified config. */
 	public static void initialize(Context context, ImagePipelineConfig imagePipelineConfig) {
 	  //1.初始化ImagePipelineFactory
@@ -661,12 +661,12 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	  //2.初始化Drawee
 	  initializeDrawee(context);
 	}
-	
+
 区别在于是否用默认的`ImagePipelineConfig`,而`ImagePipelineConfig`是通过一个builder来构造,从而确定所有的属性
 
 	private ImagePipelineConfig(Builder builder) {
 	  mAnimatedImageFactory = builder.mAnimatedImageFactory;
-	  
+
 	  //以mBitmapMemoryCacheParamsSupplier的设置为例:
 	  mBitmapMemoryCacheParamsSupplier =
 	      builder.mBitmapMemoryCacheParamsSupplier == null ?
@@ -685,24 +685,24 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	  sInstance = new ImagePipelineFactory(imagePipelineConfig);
 	}
 
-###初始化Drawee
+### 初始化Drawee
 
     //com.facebook.drawee.backends.pipeline.Fresco
 	private static void initializeDrawee(Context context) {
 	  sDraweeControllerBuilderSupplier = new PipelineDraweeControllerBuilderSupplier(context);
 	  SimpleDraweeView.initialize(sDraweeControllerBuilderSupplier);
 	}
-	
+
 	//com.facebook.drawee.view.SimpleDraweeView
 	//fresco初始化的时候将创建一个static的对象sDraweeControllerBuilderSupplier,用来在随后生成Drawee实例的时候获取DraweeControllerBuilder
 	private static Supplier<? extends SimpleDraweeControllerBuilder> sDraweeControllerBuilderSupplier;
-	
+
 	/** Initializes {@link SimpleDraweeView} with supplier of Drawee controller builders. */
 	public static void initialize(
 	    Supplier<? extends SimpleDraweeControllerBuilder> draweeControllerBuilderSupplier) {
 	  sDraweeControllerBuilderSupplier = draweeControllerBuilderSupplier;
 	}
-	
+
 	//com.facebook.drawee.view.SimpleDraweeView
 	//在SimpleDraweeView实例初始化的时候从sDraweeControllerBuilderSupplier获取SimpleDraweeControllerBuilder,这个builder会在给Drawee创建DraweeController是使用,详情可见下面的DraweeView实例化过程
 	private void init() {
@@ -714,8 +714,8 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	      "SimpleDraweeView was not initialized!");
 	  mSimpleDraweeControllerBuilder = sDraweeControllerBuilderSupplier.get();
 	}
-	
-##Drawee的实例化过程
+
+## Drawee的实例化过程
 以SimpleDraweeView为例,有两种
 
 	//在初始化完成后, 直接设置uri,这是会自动从sDraweeControllerBuilderSupplier中获取builder来构建一个controller并赋值到DraweeView中
@@ -727,7 +727,7 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	          .build();
 	  setController(controller);
 	}
-	
+
 	//第二种是通过builder创建一个区别于Fresco初始化配置的controller,便于更细节画的需求
 	Uri uri = Uri.parse("http://pooyak.com/p/progjpeg/jpegload.cgi?o=1");
 	ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
@@ -738,7 +738,7 @@ Facebook官方中已经说明,ImagePipeline负责完成加载图像,并且将结
 	    .build();
 	mProgressiveJpegView.setController(controller);
 
-##内存管理
+## 内存管理
 Fresco最强大的地方在于它对图片资源的内存优化.在Android中由java代码创建的对象存活在虚拟机中分配的内存里,这块内存受到严格的限制,在APP使用图片较多的情况下,会有泄露的风险,并且长期占用内存,导致可用内存不足,频繁GC,大大影响性能和流畅性.
 
 [facebook的post, 简单描述了fresco的内存是如何管理的(需要翻墙)](https://code.facebook.com/posts/366199913563917/introducing-fresco-a-new-image-library-for-android/)
@@ -753,20 +753,20 @@ Fresco则是利用了**ashmem**, ashmem的操作类似于Native堆的申请释�
 
 [Android系统匿名共享内存Ashmem（Anonymous Shared Memory）在进程间共享的原理分析](http://blog.csdn.net/luoshengyang/article/details/6666491)
 
-###Bitmap在Ashmem中的使用
+### Bitmap在Ashmem中的使用
 Ashmem内存区域是不能被Java应用直接使用的,但这其中有一些例外,而Bitmap是其中一个.
 
 	BitmapFactory.Osptions = new BitmapFactory.Options();
 	options.inPurgeable = true;
 	Bitmap bitmap = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length, options);
-	
+
 Purgeable被设置成true以后,这个Bigmap就是保存在Ashmem内存区域中的,Java的垃圾回收是不能回收这篇区域的内存的.当Android系统需要渲染这个Bitmap的时候,会调用pin,渲染完成后会调用unpin.而unpin后的内存空间表示能被其他人所使用.
 
 如果被unpin的Bitmap需要重新渲染,系统会再次Decode这个Bitmap.**而这个Decode的过程是在UI线程上完成的,这个操作也大大增加了CPU的负担**.所以Google后来废弃了这个pureable的参数.
 
 后来Google提供了另外一个Flag,叫inBitmap.很遗憾的是,知道Android4.4后,这个新的Flag才得到完善.而Fresco致力于实现一个包括Android2.3以及以上的Android系统都能完美工作的图片加载管理开源库,因此Fresco放弃了使用inBitmap的解决方案.
 
-###Fresco是如何利用Ashmem去给Bitmap分配和管理内存?
+### Fresco是如何利用Ashmem去给Bitmap分配和管理内存?
 上面说到的pin和unpin两个操作,对应的NDK调用是AndroidBitmap_lockPixels和unlockPixels.按照我们一惯认知,为了避免内存泄漏,这两者必须成对出现.而Fresco为了避免Bitmap再次渲染而导致的在UI线程Decode的过程,偏偏不在渲染完成后调用unlockPixels.
 
 这样做后,Fresco需要自己去管理这块内存区域,保证当这个Bitmap不再使用时,Ashmem的内存空间能被unpin.而Fresco选择在Bitmap离开屏幕可视范围时候(onDetachWindow等时候),去做unpin.
@@ -774,18 +774,13 @@ Purgeable被设置成true以后,这个Bigmap就是保存在Ashmem内存区域中
 这些都在SImpleDraweeView中封装好了,也就是说一般情况下我们使用SimpleDraweeView就行了,不太需要担心内部的处理.
 
 
-###不同版本不同对策
+### 不同版本不同对策
 由Fresco文档和`com.facebook.imagepipeline.platform.PlatformDecoder`源码可知,Fresco对不同的系统版本使用了不用的内存处理策略
 
 - 在5.0 SDK21 Lolopop以下的系统,使用ashmem
 - 在5.0 及以上系统使用了ART虚拟机,相比之下,内存管理有了很大改进,所以Bitmap缓存直接位于Java的heap上
 
-##总结
+## 总结
 如果不算ashmem的purgable,fresco还用到了三个缓存,首先是DiskCache,然后还有两个MemoryCache,分别是保存DecodedBitmap的和保存EncodedImage的缓存,除此之外,为了避免频繁的申请内存,回收内存造成内存抖动,fresco还用到了大量的对象池(基于`com.facebook.imagepipeline.memory.BasePool`),除此以外,还有`com.facebook.common.references.OOMSoftReference`使用软引用的地方.
 
 这些细节的东西暂时先留个坑吧,以后再看@@
-
-
-
-
-
