@@ -6,7 +6,7 @@ category: Develop
 tags: [java]
 ---
 
-对 Effective Java 这本书中的一些思想做一点记录.
+对 Effective Java 这本书中的一些思想做一点记录, 持续更新....
 
 ## 对象的构建
 

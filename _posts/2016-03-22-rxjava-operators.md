@@ -6,9 +6,27 @@ category: Develop
 tags: [RxJava]
 ---
 
-记录用到的变换操作符和使用场景,以及一些遇到的Tips
+记录用到的变换操作符和使用场景,以及一些遇到的Tips,会缓慢更新~~~
 
 ## 功能性的Operator
+
+### timer
+![timer](/images/2016-03-22-rxjava-operators/timer.png)
+
+>Returns an Observable that emits one item after a specified delay, and then completes.
+
+**场景**
+
+- 延时操作
+
+### interval
+![interval](/images/2016-03-22-rxjava-operators/interval.png)
+
+>Returns an Observable that emits a 0L after the initialDelay and ever increasing numbers after each period of time thereafter, on a specified Scheduler.
+
+**场景**
+
+- 周期性操作
 
 ## 过滤作用的Operator
 
@@ -79,16 +97,26 @@ first在源头Observable没有数据发出的时候,会报NoSuchElementException
 >Returns an Observable that emits the items emitted by each of the Observables emitted by the source Observable, one after the other, without interleaving them.  
 >
 
+**场景**
+
+- 三级缓存加载时,concat()组合分别从缓存,disk和网络加载的Observable,最后通过first()的条件取出有效数据
+
 **相关**
 
 `merge` `concatMap`
 concat在意顺序,而merge不保证顺序
 
 ### mergeDelayError
+![concat](/images/2016-03-22-rxjava-operators/mergeDelayError.png)
 
+>Reserving onError notifications until all of the merged Observables complete and only then passing it along to the observers
+>暂时保留 onError 的错误, 直到所有被 merged 的 Observables发送玩所有的事件, 最后再把 onError 传递到 Observers
 
-### switchMap
+**场景**
+用于保留异常或错误, 又不希望被其打断整个链的情况
 
+**相关**
+`merge`
 
 ### combineLatest
 

@@ -14,7 +14,7 @@ tags: [RxJava]
 - [错误或异常在RxJava中的处理](http://blog.danlew.net/2015/12/08/error-handling-in-rxjava/)
 
 ## 主要概念
-在官网的介绍中,说到 ReactiveX 是一个使用可观察序列(Observable的序列)来组成的异步的基于事件的程序的库. 而RxJavaze则是其用于JVM上的实现.
+在官网的介绍中,说到 ReactiveX 是一个使用可观察序列(Observable的序列)来组成的异步的基于事件的程序的库. 而RxJava则是其用于JVM上的实现.
 
 RxJava的优势相较于传统的异步回调, AsyncTask或者Handler来说要简洁,而且是能够随着程序越来越复杂而依然保持其简洁. 而且由多个Observable灵活组成的序列也能很好的满足模块间的解耦和测试.
 
