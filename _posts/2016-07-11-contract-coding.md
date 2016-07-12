@@ -15,7 +15,7 @@ Annotations 可以帮助你写出更有意义的契约,它的表现力要大于�
 	    compile 'com.android.support:support-annotations:23.3.0'
 	}
 
-##Nullness Annotations
+## Nullness Annotations
 
 ![NotNull_0](/images/2016-07-11-contract-coding/NotNull_0.png)
 
@@ -23,13 +23,13 @@ Annotations 可以帮助你写出更有意义的契约,它的表现力要大于�
 
 Nullness Annotations 一般包括 `@Nullable` 和 `@NotNull` 用于标明参数,字段或方法返回值能否为 null. 通常组件对外提供 API 时, 外部调用者并不知道接口方法有没有做 参数 null 的处理, 往往在 调用前以及接口内部都做了重复空处理或者都没做. 这种情况下, 如果非空参数就经过两次重复的验证, 不仅浪费性能而且强迫症玩家会比较痛苦. Nullness Annotations 就能很好的解决这种问题, 接口的调用者能直观看到  API 设计者的意图.
 
-##Resource Annotations
+## Resource Annotations
 
 ![StringRes](/images/2016-07-11-contract-coding/StringRes.png)
 
 Resource Annotations 一般用于标明参数的具体类别是 res 资源 id. 一个 int 类型的参数可以接收 int 值或者 res 值, 如果没有文档的话, 对调用者来说并不知道应该要传什么, 很容易造成异常.
 
-##Thread Annotations
+## Thread Annotations
 
 ![thread](/images/2016-07-11-contract-coding/thread.png)
 
@@ -37,7 +37,7 @@ Resource Annotations 一般用于标明参数的具体类别是 res 资源 id. �
 
 Thread Annotations 一般就用于标明方法或构造的线程要求.
 
-##Value Constraint Annotations
+## Value Constraint Annotations
 
 ![IntRange](/images/2016-07-11-contract-coding/IntRange.png)
 
@@ -49,19 +49,19 @@ Thread Annotations 一般就用于标明方法或构造的线程要求.
 
 `@Size` 一般用于限制集合和数组的尺寸. `@Size(2)`要求一定有两个元素; `@Size(min=1, max=10)` 要求至少有1个元素又不超过10个.
 
-##Permission Annotations
+## Permission Annotations
 
 ![RequiresPermission](/images/2016-07-11-contract-coding/RequiresPermission.png)
 
 Permission Annotations 一般用于方法, 构造, 标明需要什么权限, 如果 Manifest 里没有申明的就会以红下划线标出.
 
-##CheckResults Annotations
+## CheckResults Annotations
 
 ![CheckResult](/images/2016-07-11-contract-coding/CheckResult.png)
 
 CheckResults Annotations 一般用于当接口的返回值需要被使用时, 若调用者未使用, 则会标识.出来
 
-##CallSuper Annotations
+## CallSuper Annotations
 
 ![CallSuper](/images/2016-07-11-contract-coding/CallSuper.png)
 
@@ -71,7 +71,7 @@ CallSuper Annotations !!!很有用处. 当子类重写父类方法时,如果父�
 
 ![CallSuper_1](/images/2016-07-11-contract-coding/CallSuper_1.png)
 
-##Enumerated Annotations
+## Enumerated Annotations
 
 ![EnumeratedAnnotations](/images/2016-07-11-contract-coding/EnumeratedAnnotations.png)
 
@@ -87,7 +87,7 @@ Enumerated Annotations 用于限定一些预先设定的作为状态或模式的
 
 ![EnumeratedAnnotations_1](/images/2016-07-11-contract-coding/EnumeratedAnnotations_1.png)
 
-##总结
+## 总结
 android 自带的注解可以有效的帮助多人协作的接口做输入和输出的限制, 对于单人开发的模块也可以比文档更直观更方便的体现一些重要的信息. 个人认为以下几种最为常用, 并且值得立刻开始使用:
 
 - Nullness Annotations
