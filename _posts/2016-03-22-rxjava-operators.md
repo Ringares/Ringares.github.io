@@ -109,7 +109,7 @@ concat在意顺序,而merge不保证顺序
 ### mergeDelayError
 ![concat](/images/2016-03-22-rxjava-operators/mergeDelayError.png)
 
->Reserving onError notifications until all of the merged Observables complete and only then passing it along to the observers
+>Reserving onError notifications until all of the merged Observables complete and only then passing it along to the observers  
 >暂时保留 onError 的错误, 直到所有被 merged 的 Observables发送玩所有的事件, 最后再把 onError 传递到 Observers
 
 **场景**
