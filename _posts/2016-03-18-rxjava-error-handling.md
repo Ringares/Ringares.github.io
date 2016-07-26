@@ -47,8 +47,8 @@ tags: [RxJava]
 ### onErrorReturn & onErrorResumeNext
 可能有一下几种途径:
 
-- [onErrorReturn()](http://reactivex.io/RxJava/javadoc/rx/Observable.html#onErrorReturn(rx.functions.Func1)
-- [onErrorResumeNext()](http://reactivex.io/RxJava/javadoc/rx/Observable.html#onErrorResumeNext(rx.functions.Func1)
+- [onErrorReturn()](http://reactivex.io/RxJava/javadoc/rx/Observable.html#onErrorReturn(rx.functions.Func1))
+- [onErrorResumeNext()](http://reactivex.io/RxJava/javadoc/rx/Observable.html#onErrorResumeNext(rx.functions.Func1))
 
 ![onErrorReturn](/images/2016-03-18-rxjava-error-handling/onErrorReturn.png)
 ![onErrorResumeNext](/images/2016-03-18-rxjava-error-handling/onErrorResumeNext.png)
@@ -67,3 +67,5 @@ tags: [RxJava]
 	  .subscribe(System.out::println);
 
 ![retry](/images/2016-03-18-rxjava-error-handling/retry.png)
+
+

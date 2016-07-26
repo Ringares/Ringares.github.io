@@ -3,7 +3,7 @@ layout: post
 title: " 契约编程: Annotation"
 description: "Contract Coding: Annotation"
 category: Develop
-tags: []
+tags: [android]
 ---
 我们可以从系统源码及大多是开源项目里看到很多 Annotation 注解的身影. 此篇介绍 Android 为我们提供的 android.support.annotation, 以及在什么场景下如何使用.
 
@@ -22,6 +22,7 @@ Annotations 可以帮助你写出更有意义的契约,它的表现力要大于�
 ![NotNull_1](/images/2016-07-11-contract-coding/NotNull_1.png)
 
 Nullness Annotations 一般包括 `@Nullable` 和 `@NotNull` 用于标明参数,字段或方法返回值能否为 null. 通常组件对外提供 API 时, 外部调用者并不知道接口方法有没有做 参数 null 的处理, 往往在 调用前以及接口内部都做了重复空处理或者都没做. 这种情况下, 如果非空参数就经过两次重复的验证, 不仅浪费性能而且强迫症玩家会比较痛苦. Nullness Annotations 就能很好的解决这种问题, 接口的调用者能直观看到  API 设计者的意图.
+
 
 ## Resource Annotations
 
@@ -95,3 +96,5 @@ android 自带的注解可以有效的帮助多人协作的接口做输入和输
 - Value Constraint Annotations
 - CallSuper Annotations
 - Enumerated Annotations
+
+
