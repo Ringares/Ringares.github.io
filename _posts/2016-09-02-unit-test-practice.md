@@ -52,7 +52,7 @@ Robolectric 就此应运而生, 简单的来说, Robolectric 在本地提供了�
 
 除了基本实现了所有的公共接口外, 还提供了很多额外的很多接口，可以读取对应的Android类的一些状态. 例如, 我们知道 ImageView 有一个方法叫 setImageResource(resourceId), 然而并没有一个对应的 getter 方法叫 getImageResourceId(), 这样你是没有办法测试这个ImageView是不是显示了你想要的 image. 而在 Robolectric 实现的对应的 ShadowImageView 里面, 则提供了 getImageResourceId() 这个接口. 你可以用来测试它是不是正确的显示了你想要的 Image. 
 
-![shadow](/images/2016-09-02-unit-test-practice/shadowImageView.png)
+![shadow](/images/2016-09-02-unit-test-practice/shadowImageVIew.png)
 
 **所以当 Robolectric 加入后, 我们就可以用 JUnit 测试纯 Java 代码; 而用 Robolectric 来测试 Android 相关代码等, 并且保证极快的测试速度.**
 
