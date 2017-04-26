@@ -45,3 +45,5 @@ tags: [RxJava]
 	  .first(data -> data.isUpToDate());
 
 Last point, 于 `first` 操作符类似的一个是 `takeFirst`,它们的区别在于, `first` 在没有Observable能发出有效的数据的时候会抛出 `NoSuchElementException`; 而 `takeFirst` 会简单的走到 `onComplete`.
+
+
