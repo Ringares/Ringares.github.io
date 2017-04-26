@@ -40,10 +40,11 @@ app:layout_behavior="@string/appbar_scrolling_view_behavior"
 	}
 
 源码调用链: 
-CoordinatorLayout#onMeasure ->
-CoordinatorLayout#prepareChildren ->
-CoordinatorLayout#getResolvedLayoutParams ->
-childView.getClass().getAnnotation(DefaultBehavior.class)
+
+	CoordinatorLayout#onMeasure ->
+	CoordinatorLayout#prepareChildren ->
+	CoordinatorLayout#getResolvedLayoutParams ->
+	childView.getClass().getAnnotation(DefaultBehavior.class)
 
 ## 系统控件使用的例子
 
@@ -152,7 +153,7 @@ AppBarLayout 的子 View 需要声明一个属性`app:layout_scrollFlags` 这个
 	    </android.support.v4.widget.NestedScrollView>
 	</android.support.design.widget.CoordinatorLayout>
 
-##自定义 Behavior 的注意点及方法
+## 自定义 Behavior 的注意点及方法
 
 Behavior 是用来控制, 在 CoordinatorLayout 下的子 View(child) 依赖另一个同级 View(dependency) 时的行为; 当 dependency 的 行为改变时, child 可以作出相应的改变. 被依赖 View(dependency) 可以分为两类:
 
