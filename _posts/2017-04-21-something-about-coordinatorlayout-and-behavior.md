@@ -206,8 +206,8 @@ Behavior 是用来控制, 在 CoordinatorLayout 下的子 View(child) 依赖另�
 
 <br>
 
->**CoordinatorLayout.Behavior#layoutDependsOn
->(CoordinatorLayout parent, V child, View dependency)**
+>**CoordinatorLayout.Behavior#layoutDependsOn**
+>**(CoordinatorLayout parent, V child, View dependency)**
 
 这个方法在 Layout 阶段至少被调用一次, 来决定是否有依赖的 dependency. 如果依赖关系成立, 那么在 dependency 的大小和位置改变时, 下面这个方法 `onDependentViewChanged` 就会被调用.
 
@@ -215,8 +215,8 @@ Behavior 是用来控制, 在 CoordinatorLayout 下的子 View(child) 依赖另�
 
 <br>
 		
->**CoordinatorLayout.Behavior#onDependentViewChanged
->(CoordinatorLayout parent, V child, View dependency)**
+>**CoordinatorLayout.Behavior#onDependentViewChanged**
+>**(CoordinatorLayout parent, V child, View dependency)**
 
 使 child 响应 dependency 的改变 
 
