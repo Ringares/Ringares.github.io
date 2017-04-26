@@ -14,7 +14,6 @@ tags: [android]
 - CollapsingToolbarLayout
 - NestedScrollView, RecyclerView, SwipRefreshLayout
 
-
 由于国内的特殊应用生态, 可能不能照搬 Material Design. 但完全不用担心没法使用原生的控件, 其实 CoordinatorLayout 配合自定义的 Behavior 就完全可以比较方便的实现很多交互的效果了.
 
 
@@ -90,9 +89,15 @@ app:layout_behavior="@string/appbar_scrolling_view_behavior"
 	
 	</android.support.design.widget.CoordinatorLayout>
 
+<br>
+
 RecyclerView 的属性 `app:layout_behavior="@string/appbar_scrolling_view_behavior"` 在这的作用是告诉 CoordinatorLayout 我是被 AppBarLayout 依赖的, 这个 Behavior 决定了 layout 的位置. (CoordinatorLayout 在 onLayout()方法中会根据 Behavior 调整子 View 的位置)
 
+<br>
+
 AppBarLayout 就是通过注解使用了 AppBarLayout.Behavior. 这个 Behavior 有依赖 `NestedScrollingChild` 也就是 RecyclerView 的滚动行为 (下文自定义部分会提到).
+
+<br>
 
 AppBarLayout 的子 View 需要声明一个属性`app:layout_scrollFlags` 这个属性决定了滚动时 AppBarLayout 的规则.
 
@@ -102,6 +107,8 @@ AppBarLayout 的子 View 需要声明一个属性`app:layout_scrollFlags` 这个
 - **enterAlwaysCollapsed**: 当你的视图已经设置minHeight属性又使用此标志时, 你的视图只能以最小高度进入, 只有当滚动视图到达顶部时才扩大到完整高度
 - **exitUntilCollapsed**: 当视图会在滚动时, 它一直滚动到设置的minHeight时完全隐藏
 
+
+<br>
 
 **CollapsingToolbarLayout**
 ![查看collapsing gif](/images/2017-04-21-something-about-coordinatorlayout-and-behavior/collapsing.gif)
@@ -160,6 +167,8 @@ Behavior 是用来控制, 在 CoordinatorLayout 下的子 View(child) 依赖另�
 1. **任意 View, 一般参照其位置及本身状态信息, 如所在位置, 大小, alpha 等等** (例如 FloatingActionButton.Behavior)
 2. **实现了 NestedScrollingChild 接口的类, 主要参照滚动相关的信息** (例如 AppBarLayout.Behavior)
 
+<br>
+
 具体来说, 满足以下几点, Behavior 才会生效:
 
 - 拥有 Behavior 的 View 必须是 CoordinatorLayout 的直接子 View
@@ -195,18 +204,23 @@ Behavior 是用来控制, 在 CoordinatorLayout 下的子 View(child) 依赖另�
 	       
 而依赖一个 View 的位置及本身状态信息的 Behavior, 主要需要重写两个方法:
 
->**android.support.design.widget.CoordinatorLayout.Behavior#layoutDependsOn
+<br>
+
+>**CoordinatorLayout.Behavior#layoutDependsOn
 >(CoordinatorLayout parent, V child, View dependency)**
 
 这个方法在 Layout 阶段至少被调用一次, 来决定是否有依赖的 dependency. 如果依赖关系成立, 那么在 dependency 的大小和位置改变时, 下面这个方法 `onDependentViewChanged` 就会被调用.
 
 另外需要注意的是:当确定依赖关系后, 当 dependency 被布局(或测量)后 child 会紧接着被布局(或测量), CoordinatorLayout 会无视子 view 的顺序(原因是 CoordinatorLayout 内有个 ComparatormLayoutDependencyComparator 会按照依赖关系对所有的子 View 进行排序), 这会影响它们的测量以及布局顺序).
 
-
->**android.support.design.widget.CoordinatorLayout.Behavior#onDependentViewChanged
+<br>
+		
+>**CoordinatorLayout.Behavior#onDependentViewChanged
 >(CoordinatorLayout parent, V child, View dependency)**
 
 使 child 响应 dependency 的改变 
+
+<br>
 
 	public class TopBtmScrollBehavior extends CoordinatorLayout.Behavior {
 	
@@ -249,28 +263,58 @@ Behavior 是用来控制, 在 CoordinatorLayout 下的子 View(child) 依赖另�
 	    }
 	}
 
+<br>
 
 **2. 依赖滚动**
-上面的例子也可以用依赖滚动的方式来实现, 这种方式需要重写主要是三个方法:
+上面的例子也可以用依赖滚动的方式来实现, 这种方式需要关注的主要是这几个方法:
 
 	@Override
 	public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, View child, View directTargetChild, View target, int nestedScrollAxes) {
-	    return true;//这里返回true，才会接受到后续滑动事件。
+		//nestedScrollAxes 是滑动方向, 可用于判断
+		return true;//这里返回true, 才会接受到后续滑动事件。
 	}
 	
 	@Override
+	public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, V child, View target, int dx, int dy, int[] consumed) {
+			//可以告诉系统, 这个 behavior 需要消耗多少滚动的距离
+		}       
+		 
+	@Override
 	public void onNestedScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
-	//进行滑动事件处理
+		//进行滑动事件处理
+	}
+	
+	public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, V child, View target, float velocityX, float velocityY) {
+		//类似 onNestedPreScroll
+		return false; //Behavior 是否消耗掉了 filing
 	}
 	
 	@Override
 	public boolean onNestedFling(CoordinatorLayout coordinatorLayout, View child, View target, float velocityX, float velocityY, boolean consumed) {
-	//当进行快速滑动
-	    return super.onNestedFling(coordinatorLayout, child, target, velocityX, velocityY, consumed);
+		//当进行快速滑动
+		return super.onNestedFling(coordinatorLayout, child, target, velocityX, velocityY, consumed);
+	}
+	
+	@Override
+	public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, V child, View target) {
+		//滚动停止时
 	}
 
-注意被依赖的View只有实现了NestedScrollingChild接口的才可以将事件传递给CoordinatorLayout。
-但注意这个滑动事件是对于CoordinatorLayout的。所以只要CoordinatorLayout有NestedScrollingChild就会滑动，他滑动就会触发这几个回调。无论你是否依赖了那个View。
+只要 CoordinatorLayout 有 NestedScrollingChild, 他滑动就会触发这几个回调. 无论你是否依赖了那个View. 而且 NestedScrollingChild 不需要是直接子 View.
+
+这几个方法的调用流程如下:
+
+1. 如果你对滚动事件感兴趣, 可以重写 onStartNestedScroll() 函数. 在该函数中可以知道滚动的方向（水平滚动或者垂直滚动）, 如果你想继续收到该方向的滚动事件, 则必须返回 true.
+
+2. onStartNestedScroll() 返回 true 以后, 在滚动的 View 开始滚动之前调用 onNestedPreScroll() 函数, 在该函数内你的 Behavior 可以吃掉（消耗）部分或者全部滚动的距离, 最后的 int[] 参数为返回值参数, 告诉系统你处理了多少滚动距离.（比如 用户在屏幕上滑动了100像素，滚动的 View 本来应该滚动 100 像素, 但是你的 Behavior 完全吃掉了这100个像素的滚动距离, 则 滚动的 View 就没有滚动了.）
+
+3. 滚动的 View 滚动的时候将会调用 onNestedScroll() .这个函数可以知道滚动的 View 滚动的多少距离, 还有多少没有消耗的距离（滚动到头了）.
+
+4. 对于 fling 操作是同样的处理流程.
+
+5. 当嵌套滚动停止的时候, 会调用 onStopNestedScroll().
+
+<br>
 
 	public class ScrollBasedBehavior extends CoordinatorLayout.Behavior {
 	    private boolean isAnimate;
@@ -351,10 +395,14 @@ Behavior 是用来控制, 在 CoordinatorLayout 下的子 View(child) 依赖另�
 - xml app:layout_behavior
 - 注解
 
+<br>
+
 **Behavior 依赖的两种类型和重写方法**
 
 - 任意 View, 一般参照其位置及本身状态信息, 如所在位置, 大小, alpha 等等 (例如 FloatingActionButton.Behavior)
 - 实现了 NestedScrollingChild 接口的类, 主要参照滚动相关的信息 (例如 AppBarLayout.Behavior)
+
+<br>
 
 **Behavior 生效的注意点**
 
