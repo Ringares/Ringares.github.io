@@ -18,7 +18,7 @@ tags: [android]
 由于国内的特殊应用生态, 可能不能照搬 Material Design. 但完全不用担心没法使用原生的控件, 其实 CoordinatorLayout 配合自定义的 Behavior 就完全可以比较方便的实现很多交互的效果了.
 
 
-##使用 Behavior 的三种方式
+## 使用 Behavior 的三种方式
 
 一般来说前两种会比较常用.
 
@@ -45,7 +45,7 @@ CoordinatorLayout#prepareChildren ->
 CoordinatorLayout#getResolvedLayoutParams ->
 childView.getClass().getAnnotation(DefaultBehavior.class)
 
-##系统控件使用的例子
+## 系统控件使用的例子
 
 **AppBarLayout & Scroll**
 ![查看norma gif](/images/2017-04-21-something-about-coordinatorlayout-and-behavior/normal.gif)
@@ -194,14 +194,17 @@ Behavior 是用来控制, 在 CoordinatorLayout 下的子 View(child) 依赖另�
 	       
 而依赖一个 View 的位置及本身状态信息的 Behavior, 主要需要重写两个方法:
 
->**android.support.design.widget.CoordinatorLayout.Behavior#layoutDependsOn(CoordinatorLayout parent, V child, View dependency)**
+>**android.support.design.widget.CoordinatorLayout.Behavior#layoutDependsOn
+>(CoordinatorLayout parent, V child, View dependency)**
 
 这个方法在 Layout 阶段至少被调用一次, 来决定是否有依赖的 dependency. 如果依赖关系成立, 那么在 dependency 的大小和位置改变时, 下面这个方法 `onDependentViewChanged` 就会被调用.
 
 另外需要注意的是:当确定依赖关系后, 当 dependency 被布局(或测量)后 child 会紧接着被布局(或测量), CoordinatorLayout 会无视子 view 的顺序(原因是 CoordinatorLayout 内有个 ComparatormLayoutDependencyComparator 会按照依赖关系对所有的子 View 进行排序), 这会影响它们的测量以及布局顺序).
 
 
->**android.support.design.widget.CoordinatorLayout.Behavior#onDependentViewChanged(CoordinatorLayout parent, V child, View dependency)**
+>**android.support.design.widget.CoordinatorLayout.Behavior#onDependentViewChanged
+>(CoordinatorLayout parent, V child, View dependency)**
+
 使 child 响应 dependency 的改变 
 
 	public class TopBtmScrollBehavior extends CoordinatorLayout.Behavior {
@@ -339,9 +342,7 @@ Behavior 是用来控制, 在 CoordinatorLayout 下的子 View(child) 依赖另�
 	    }
 	}
 
-
-
-##总结
+## 总结
 
 **使用 Behavior 的三种方式**
 
