@@ -6,7 +6,7 @@ category: Develop
 tags: [android]
 ---
 
-伴随着 Android 5.0 Lollipop 发布, Google 在 Android Design Support Library 中推出了一系列符合 Material Design 规范的控件. 本篇将会涉及到如下内容:
+本篇将会涉及到如下内容:
 
 - **CoordinatorLayout**
 - **Behavior**
