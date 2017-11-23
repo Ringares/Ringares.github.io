@@ -276,8 +276,8 @@ Behavior 是用来控制, 在 CoordinatorLayout 下的子 View(child) 依赖另�
 	
 	@Override
 	public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, V child, View target, int dx, int dy, int[] consumed) {
-			//可以告诉系统, 这个 behavior 需要消耗多少滚动的距离
-		}       
+		//可以告诉系统, 这个 behavior 需要消耗多少滚动的距离
+	}       
 		 
 	@Override
 	public void onNestedScroll(CoordinatorLayout coordinatorLayout, View child, View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
