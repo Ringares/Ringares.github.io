@@ -2,7 +2,7 @@
 layout: post
 title: "从 Boosted Tree 到 GBDT 再到 XGBoost"
 description: "XGBoost"
-category: 
+category: Machine Learning
 tags: [ML]
 ---
 

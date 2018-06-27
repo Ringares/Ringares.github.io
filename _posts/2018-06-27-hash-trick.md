@@ -2,7 +2,7 @@
 layout: post
 title: "Hash Trick"
 description: ""
-category: 
+category: Machine Learning
 tags: [ML]
 ---
 
